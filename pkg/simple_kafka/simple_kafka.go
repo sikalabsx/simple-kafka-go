@@ -2,6 +2,7 @@ package simple_kafka
 
 import (
 	"context"
+	"os"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -21,6 +22,13 @@ func SimpleKafkaNewReader(brokers []string, topic, groupID string) SimpleKafka {
 	}
 }
 
+func SimpleKafkaNewReaderFromEnv() SimpleKafka {
+	brokers := []string{os.Getenv("SIMPLE_KAFKA_BROKER")}
+	topic := os.Getenv("SIMPLE_KAFKA_TOPIC")
+	groupID := os.Getenv("SIMPLE_KAFKA_GROUP_ID")
+	return SimpleKafkaNewReader(brokers, topic, groupID)
+}
+
 func SimpleKafkaNewWriter(brokers []string, topic string) SimpleKafka {
 	return SimpleKafka{
 		writer: kafka.NewWriter(kafka.WriterConfig{
@@ -28,6 +36,12 @@ func SimpleKafkaNewWriter(brokers []string, topic string) SimpleKafka {
 			Topic:   topic,
 		}),
 	}
+}
+
+func SimpleKafkaNewWriterFromEnv() SimpleKafka {
+	brokers := []string{os.Getenv("SIMPLE_KAFKA_BROKER")}
+	topic := os.Getenv("SIMPLE_KAFKA_TOPIC")
+	return SimpleKafkaNewWriter(brokers, topic)
 }
 
 func (sk *SimpleKafka) Consume() (kafka.Message, error) {
